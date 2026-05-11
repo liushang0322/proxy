@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7
 FROM node:20-alpine
 
 WORKDIR /app
@@ -13,7 +14,7 @@ RUN npm config set registry ${NPM_REGISTRY} \
 COPY package.json package-lock.json ./
 COPY apps/web/package.json apps/web/package.json
 
-RUN npm ci --verbose
+RUN --mount=type=cache,target=/root/.npm npm ci --verbose
 
 COPY . .
 
