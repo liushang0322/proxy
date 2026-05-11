@@ -3,29 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "db:push": "node ./scripts/db-push.mjs",
-    "test": "vitest run"
+    "dev": "node server.js",
+    "build": "node --check server.js && node --test tests/config.test.js",
+    "start": "node server.js",
+    "db:push": "node -e \"console.log('No database migration step required')\"",
+    "test": "node --test tests/config.test.js"
   },
   "dependencies": {
-    "@prisma/client": "^6.8.2",
     "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
     "dockerode": "^4.0.6",
-    "next": "^15.3.2",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "yaml": "^2.8.0",
-    "zod": "^3.24.4"
-  },
-  "devDependencies": {
-    "@types/dockerode": "^4.0.1",
-    "@types/node": "^22.15.18",
-    "@types/react": "^19.1.5",
-    "@types/react-dom": "^19.1.5",
-    "prisma": "^6.8.2",
-    "typescript": "^5.8.3",
-    "vitest": "^3.1.4"
+    "express": "^4.21.2",
+    "yaml": "^2.8.0"
   }
 }

@@ -19,9 +19,8 @@ RUN --mount=type=cache,target=/root/.npm npm ci --verbose
 COPY . .
 
 WORKDIR /app/apps/web
-
-RUN npx prisma generate && npm run build
+RUN npm run build
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx prisma db push && npm run start"]
+CMD ["npm", "run", "start"]

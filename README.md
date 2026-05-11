@@ -4,14 +4,14 @@ Private control panel and deployment bundle for `vpn.lshang.top`.
 
 ## What it includes
 
-- A `Next.js` admin panel for:
+- A lightweight Node admin panel for:
   - login
   - server and proxy settings
   - family client management
   - Clash Verge subscription generation
   - Shadowrocket import generation
   - sing-box deploy/restart actions
-- A `Prisma + SQLite` data layer
+- A file-backed JSON data layer in `runtime/data/state.json`
 - A `deploy/` folder with `docker-compose`, `nginx`, and `sing-box` assets
 
 ## Local development
@@ -92,3 +92,4 @@ bash deploy/scripts/renew-certs.sh
 - `443/tcp` serves the admin panel through `nginx`.
 - `8443/tcp` is the Trojan fallback port.
 - The panel controls Docker through `/var/run/docker.sock`.
+- The new panel removes the heavy `Next.js + Prisma` build step to keep server deployment fast.
