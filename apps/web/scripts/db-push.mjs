@@ -6,7 +6,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const appRoot = path.resolve(__dirname, "..");
 const env = {
   ...process.env,
-  DATABASE_URL: process.env.DATABASE_URL ?? "file:./prisma/dev.db"
+  DATABASE_URL: process.env.DATABASE_URL ?? "file:./dev.db"
 };
 
 const child = spawn("npx", ["prisma", "db", "push"], {
@@ -19,4 +19,3 @@ const child = spawn("npx", ["prisma", "db", "push"], {
 child.on("exit", (code) => {
   process.exit(code ?? 1);
 });
-

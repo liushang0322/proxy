@@ -4,7 +4,7 @@ const env = {
   sessionSecret: process.env.SESSION_SECRET ?? "dev-only-session-secret",
   adminUsername: process.env.ADMIN_USERNAME ?? "admin",
   adminPassword: process.env.ADMIN_PASSWORD ?? "admin123456",
-  databaseUrl: process.env.DATABASE_URL ?? "file:./prisma/dev.db",
+  databaseUrl: process.env.DATABASE_URL ?? "file:./dev.db",
   runtimeDir: process.env.RUNTIME_DIR ?? process.cwd(),
   certificatePath:
     process.env.CERTIFICATE_PATH ??
@@ -16,4 +16,3 @@ const env = {
 };
 
 export default env;
-
