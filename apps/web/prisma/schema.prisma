@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model ServerSettings {
+  id              Int      @id
+  domain          String
+  serverIp        String
+  certificatePath String
+  privateKeyPath  String
+  panelPort       Int      @default(443)
+  hysteriaPort    Int      @default(443)
+  trojanPort      Int      @default(8443)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ProxyProfile {
+  id               Int      @id
+  hy2ObfsPassword  String
+  hy2UpMbps        Int      @default(100)
+  hy2DownMbps      Int      @default(100)
+  enableTrojan     Boolean  @default(true)
+  masqueradeUrl    String   @default("https://www.apple.com")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model ClientProfile {
+  id             String   @id @default(cuid())
+  name           String
+  displayName    String
+  token          String   @unique
+  hy2Password    String
+  trojanPassword String
+  enabled        Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+

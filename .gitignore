@@ -1,0 +1,11 @@
+node_modules
+.next
+dist
+coverage
+runtime
+.env
+apps/web/prisma/dev.db
+apps/web/prisma/dev.db-journal
+apps/web/.next
+apps/web/node_modules
+
