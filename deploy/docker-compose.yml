@@ -3,6 +3,8 @@ services:
     build:
       context: ..
       dockerfile: apps/web/Dockerfile
+      args:
+        NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
     container_name: vpn-web
     restart: unless-stopped
     env_file:
@@ -37,4 +39,3 @@ services:
     volumes:
       - ../runtime/generated/sing-box.json:/etc/sing-box/config.json
       - ../runtime/letsencrypt:/etc/letsencrypt
-

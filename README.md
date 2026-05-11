@@ -30,6 +30,12 @@ Default credentials come from `.env`:
 - username: `ADMIN_USERNAME`
 - password: `ADMIN_PASSWORD`
 
+For servers with slow access to the default npm registry, set:
+
+```bash
+NPM_REGISTRY=https://registry.npmmirror.com
+```
+
 ## Production layout
 
 Expected runtime directories on the server:
