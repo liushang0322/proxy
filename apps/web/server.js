@@ -14,6 +14,7 @@ const env = {
   sessionSecret: process.env.SESSION_SECRET || "dev-only-session-secret",
   adminUsername: process.env.ADMIN_USERNAME || "admin",
   adminPassword: process.env.ADMIN_PASSWORD || "admin123456",
+  panelPublicPort: Number(process.env.PANEL_PUBLIC_PORT || 3001),
   runtimeDir: process.env.RUNTIME_DIR || path.resolve(process.cwd(), "../../runtime"),
   certificatePath:
     process.env.CERTIFICATE_PATH ||
@@ -83,7 +84,9 @@ async function readState() {
   await ensureRuntimeDirectories();
   try {
     const raw = await fs.readFile(runtimePaths.stateFile, "utf8");
-    return JSON.parse(raw);
+    const parsed = applyMigrations(JSON.parse(raw));
+    await writeState(parsed);
+    return parsed;
   } catch {
     const passwordHash = await bcrypt.hash(env.adminPassword, 10);
     const initial = {
@@ -97,7 +100,7 @@ async function readState() {
         certificatePath: env.certificatePath,
         privateKeyPath: env.privateKeyPath,
         panelPort: 443,
-        hysteriaPort: 443,
+        hysteriaPort: 2443,
         trojanPort: 8443
       },
       proxy: {
@@ -107,6 +110,7 @@ async function readState() {
         enableTrojan: true,
         masqueradeUrl: "https://www.apple.com"
       },
+      metaVersion: 2,
       clients: [
         {
           id: crypto.randomUUID(),
@@ -122,6 +126,16 @@ async function readState() {
     await writeState(initial);
     return initial;
   }
+}
+
+function applyMigrations(state) {
+  if (!state.metaVersion) {
+    if (state.server && state.server.hysteriaPort === 443) {
+      state.server.hysteriaPort = 2443;
+    }
+    state.metaVersion = 2;
+  }
+  return state;
 }
 
 async function writeState(state) {

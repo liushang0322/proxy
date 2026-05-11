@@ -9,32 +9,19 @@ services:
     restart: unless-stopped
     env_file:
       - ../.env
-    environment:
-      DATABASE_URL: file:/runtime/data/app.db
-      RUNTIME_DIR: /runtime
+    ports:
+      - "${PANEL_PUBLIC_PORT:-3001}:3000"
     volumes:
       - ../runtime:/runtime
       - /var/run/docker.sock:/var/run/docker.sock
-
-  nginx:
-    image: nginx:1.27-alpine
-    container_name: vpn-nginx
-    depends_on:
-      - web
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - ../runtime/letsencrypt:/etc/letsencrypt
-      - ../runtime/acme-webroot:/var/www/certbot
 
   sing-box:
     image: ghcr.io/sagernet/sing-box:latest
     container_name: sing-box
     restart: unless-stopped
-    network_mode: host
+    ports:
+      - "2443:2443/udp"
+      - "8443:8443/tcp"
     command: ["run", "-c", "/etc/sing-box/config.json"]
     volumes:
       - ../runtime/generated/sing-box.json:/etc/sing-box/config.json
