@@ -115,7 +115,7 @@ async function readState() {
         {
           id: crypto.randomUUID(),
           name: "owner",
-          displayName: "Owner",
+          displayName: "管理员设备",
           token: randomSecret(),
           hy2Password: randomSecret(),
           trojanPassword: randomSecret(),
@@ -281,13 +281,13 @@ function buildShadowrocketText(server, proxy, client) {
   const trojanName = encodeURIComponent(`${client.displayName} Trojan`);
   const lines = [
     `# ${client.displayName}`,
-    "# Import the Hysteria2 line first in Shadowrocket.",
+    "# 先在 Shadowrocket 中导入下面这条 Hysteria2 主线路。",
     `hysteria2://${encodeURIComponent(client.hy2Password)}@${server.domain}:${server.hysteriaPort}?sni=${encodeURIComponent(server.domain)}&obfs=salamander&obfs-password=${encodeURIComponent(proxy.hy2ObfsPassword)}&upmbps=${proxy.hy2UpMbps}&downmbps=${proxy.hy2DownMbps}#${hy2Name}`
   ];
   if (proxy.enableTrojan) {
     lines.push(
       "",
-      "# Fallback Trojan line",
+      "# 备用 Trojan 线路",
       `trojan://${encodeURIComponent(client.trojanPassword)}@${server.domain}:${server.trojanPort}?peer=${encodeURIComponent(server.domain)}&sni=${encodeURIComponent(server.domain)}#${trojanName}`
     );
   }
@@ -335,7 +335,7 @@ function esc(value) {
 function renderLogin(error = "") {
   return `<!doctype html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>VPN Control</title>
+<title>代理控制台</title>
 <style>
 body{margin:0;min-height:100vh;display:grid;place-items:center;background:#efe8dd;font-family:Segoe UI,PingFang SC,Microsoft YaHei,sans-serif;color:#1f1e1b}
 .card{width:min(460px,calc(100vw - 24px));background:#fffdf8;border:1px solid rgba(31,30,27,.12);border-radius:22px;padding:24px;box-shadow:0 18px 60px rgba(71,52,36,.12)}
@@ -343,11 +343,11 @@ input{width:100%;padding:12px 14px;border-radius:14px;border:1px solid rgba(31,3
 button{margin-top:16px;border:0;background:#c44b2d;color:#fff;padding:11px 18px;border-radius:999px;cursor:pointer}
 .muted{color:#655f56}.warn{color:#a65011}
 </style></head><body><form class="card" method="post" action="/api/auth/login">
-<h1>VPN Control</h1><p class="muted">Sign in to manage vpn.lshang.top.</p>
-<label>Username<input name="username" value="${esc(env.adminUsername)}"></label>
-<label>Password<input type="password" name="password"></label>
+<h1>代理控制台</h1><p class="muted">登录后管理 vpn.lshang.top 的面板、节点和订阅。</p>
+<label>账号<input name="username" value="${esc(env.adminUsername)}"></label>
+<label>密码<input type="password" name="password"></label>
 ${error ? `<p class="warn">${esc(error)}</p>` : ""}
-<button type="submit">Sign in</button></form></body></html>`;
+<button type="submit">登录</button></form></body></html>`;
 }
 
 function renderDashboard(state, status) {
@@ -363,45 +363,45 @@ input,textarea{width:100%;padding:12px 14px;border-radius:14px;border:1px solid 
 button.secondary{background:rgba(31,30,27,.08);color:var(--text)}.row{display:flex;gap:12px;flex-wrap:wrap}.muted{color:var(--muted)}.mono{font-family:Consolas,monospace;word-break:break-all}
 a{color:inherit;text-decoration:none}h1,h2,h3{margin:0 0 10px}label{display:grid;gap:8px}.section{margin-top:16px}.client{border:1px solid var(--line);border-radius:18px;padding:14px;background:#fff}
 </style></head><body><div class="shell">
-<div class="row" style="justify-content:space-between;align-items:center"><div><h1>vpn.lshang.top</h1><p class="muted">Lightweight control panel for sing-box.</p></div><form method="post" action="/api/auth/logout"><button class="secondary">Log out</button></form></div>
+<div class="row" style="justify-content:space-between;align-items:center"><div><h1>vpn.lshang.top</h1><p class="muted">轻量代理控制台，用于管理 sing-box 和客户端订阅。</p></div><form method="post" action="/api/auth/logout"><button class="secondary">退出登录</button></form></div>
 <div class="grid cards section">
-<div class="panel"><div class="muted">Docker / sing-box</div><h2>${esc(status.docker.containerState)}</h2><div class="muted">${esc(status.docker.available ? "Docker socket reachable" : status.docker.message || "Unavailable")}</div></div>
-<div class="panel"><div class="muted">TLS files</div><h2>${status.certificatePresent && status.privateKeyPresent ? "Ready" : "Missing"}</h2><div class="muted">cert ${status.certificatePresent ? "found" : "missing"} / key ${status.privateKeyPresent ? "found" : "missing"}</div></div>
-<div class="panel"><div class="muted">Active clients</div><h2>${state.clients.filter((item) => item.enabled).length}</h2><div class="muted">${state.clients.length} total profiles</div></div>
-<div class="panel"><div class="muted">Last deploy</div><h2>${esc(status.lastDeployAt || "Never")}</h2><div class="muted">${esc(state.server.domain)}</div></div>
+<div class="panel"><div class="muted">Docker / sing-box</div><h2>${esc(status.docker.containerState)}</h2><div class="muted">${esc(status.docker.available ? "Docker 连接正常" : status.docker.message || "不可用")}</div></div>
+<div class="panel"><div class="muted">TLS 证书</div><h2>${status.certificatePresent && status.privateKeyPresent ? "已就绪" : "缺失"}</h2><div class="muted">证书 ${status.certificatePresent ? "存在" : "缺失"} / 私钥 ${status.privateKeyPresent ? "存在" : "缺失"}</div></div>
+<div class="panel"><div class="muted">启用中的客户端</div><h2>${state.clients.filter((item) => item.enabled).length}</h2><div class="muted">总共 ${state.clients.length} 个配置</div></div>
+<div class="panel"><div class="muted">上次部署时间</div><h2>${esc(status.lastDeployAt || "从未部署")}</h2><div class="muted">${esc(state.server.domain)}</div></div>
 </div>
 <div class="grid two section">
 <form class="panel" method="post" action="/settings/server">
-<h2>Server Settings</h2>
+<h2>服务器设置</h2>
 <div class="grid two">
-<label>Domain<input name="domain" value="${esc(state.server.domain)}"></label>
-<label>Server IP<input name="serverIp" value="${esc(state.server.serverIp)}"></label>
-<label>Certificate path<input name="certificatePath" value="${esc(state.server.certificatePath)}"></label>
-<label>Private key path<input name="privateKeyPath" value="${esc(state.server.privateKeyPath)}"></label>
-<label>Hysteria2 UDP port<input name="hysteriaPort" type="number" value="${esc(state.server.hysteriaPort)}"></label>
-<label>Trojan TCP port<input name="trojanPort" type="number" value="${esc(state.server.trojanPort)}"></label>
-</div><div class="row" style="margin-top:14px"><button>Save server settings</button></div></form>
+<label>域名<input name="domain" value="${esc(state.server.domain)}"></label>
+<label>服务器 IP<input name="serverIp" value="${esc(state.server.serverIp)}"></label>
+<label>证书路径<input name="certificatePath" value="${esc(state.server.certificatePath)}"></label>
+<label>私钥路径<input name="privateKeyPath" value="${esc(state.server.privateKeyPath)}"></label>
+<label>Hysteria2 UDP 端口<input name="hysteriaPort" type="number" value="${esc(state.server.hysteriaPort)}"></label>
+<label>Trojan TCP 端口<input name="trojanPort" type="number" value="${esc(state.server.trojanPort)}"></label>
+</div><div class="row" style="margin-top:14px"><button>保存服务器设置</button></div></form>
 <form class="panel" method="post" action="/settings/proxy">
-<h2>Proxy Settings</h2>
+<h2>代理设置</h2>
 <div class="grid two">
-<label>Hysteria2 up Mbps<input name="hy2UpMbps" type="number" value="${esc(state.proxy.hy2UpMbps)}"></label>
-<label>Hysteria2 down Mbps<input name="hy2DownMbps" type="number" value="${esc(state.proxy.hy2DownMbps)}"></label>
-<label>Hysteria2 obfs password<input name="hy2ObfsPassword" value="${esc(state.proxy.hy2ObfsPassword)}"></label>
-<label>Masquerade URL<input name="masqueradeUrl" value="${esc(state.proxy.masqueradeUrl)}"></label>
-<label><span>Trojan enabled</span><input name="enableTrojan" type="checkbox" ${state.proxy.enableTrojan ? "checked" : ""}></label>
-</div><div class="row" style="margin-top:14px"><button>Save proxy settings</button></div></form>
+<label>Hysteria2 上行 Mbps<input name="hy2UpMbps" type="number" value="${esc(state.proxy.hy2UpMbps)}"></label>
+<label>Hysteria2 下行 Mbps<input name="hy2DownMbps" type="number" value="${esc(state.proxy.hy2DownMbps)}"></label>
+<label>Hysteria2 混淆密码<input name="hy2ObfsPassword" value="${esc(state.proxy.hy2ObfsPassword)}"></label>
+<label>伪装 URL<input name="masqueradeUrl" value="${esc(state.proxy.masqueradeUrl)}"></label>
+<label><span>启用 Trojan 备用线路</span><input name="enableTrojan" type="checkbox" ${state.proxy.enableTrojan ? "checked" : ""}></label>
+</div><div class="row" style="margin-top:14px"><button>保存代理设置</button></div></form>
 </div>
-<div class="panel section"><h2>Deployment</h2><p class="muted">Write a fresh sing-box config and restart the container.</p><div class="row"><form method="post" action="/actions/deploy"><button>Deploy config</button></form><form method="post" action="/actions/restart"><button class="secondary">Restart sing-box</button></form></div></div>
-<div class="panel section"><h2>Add client</h2><form class="grid two" method="post" action="/clients"><label>Unique name<input name="name" placeholder="mom"></label><label>Display name<input name="displayName" placeholder="Mom iPhone"></label><div class="row"><button>Add client</button></div></form></div>
+<div class="panel section"><h2>部署</h2><p class="muted">写入最新的 sing-box 配置并重启容器。</p><div class="row"><form method="post" action="/actions/deploy"><button>部署配置</button></form><form method="post" action="/actions/restart"><button class="secondary">重启 sing-box</button></form></div></div>
+<div class="panel section"><h2>新增客户端</h2><form class="grid two" method="post" action="/clients"><label>唯一名称<input name="name" placeholder="mom"></label><label>显示名称<input name="displayName" placeholder="妈妈手机"></label><div class="row"><button>新增客户端</button></div></form></div>
 <div class="grid cards section">
 ${state.clients
   .map((client) => {
     const baseUrl = `https://${state.server.domain}`;
     return `<div class="client"><h3>${esc(client.displayName)}</h3><div class="muted mono">${esc(client.name)}</div>
     <form class="grid" method="post" action="/clients/${client.id}" style="margin-top:12px">
-    <label>Display name<input name="displayName" value="${esc(client.displayName)}"></label>
-    <label><span>Enabled</span><input type="checkbox" name="enabled" ${client.enabled ? "checked" : ""}></label>
-    <div class="row"><button class="secondary">Save profile</button><button class="secondary" formaction="/clients/${client.id}/rotate" formmethod="post">Rotate secrets</button></div></form>
+    <label>显示名称<input name="displayName" value="${esc(client.displayName)}"></label>
+    <label><span>启用</span><input type="checkbox" name="enabled" ${client.enabled ? "checked" : ""}></label>
+    <div class="row"><button class="secondary">保存客户端</button><button class="secondary" formaction="/clients/${client.id}/rotate" formmethod="post">重置密钥</button></div></form>
     <div class="grid" style="margin-top:12px">
     <a class="mono" target="_blank" href="${baseUrl}/api/subscriptions/clash/${client.token}">${baseUrl}/api/subscriptions/clash/${client.token}</a>
     <a class="mono" target="_blank" href="${baseUrl}/api/subscriptions/shadowrocket/${client.token}">${baseUrl}/api/subscriptions/shadowrocket/${client.token}</a>
@@ -430,9 +430,9 @@ app.post("/api/auth/login", async (req, res) => {
     username === state.admin.username && (await bcrypt.compare(password || "", state.admin.passwordHash));
   if (!ok) {
     if ((req.headers["content-type"] || "").includes("application/json")) {
-      return res.status(401).json({ error: "Invalid username or password" });
+      return res.status(401).json({ error: "账号或密码错误" });
     }
-    return res.redirect("/login?error=Invalid%20username%20or%20password");
+    return res.redirect("/login?error=%E8%B4%A6%E5%8F%B7%E6%88%96%E5%AF%86%E7%A0%81%E9%94%99%E8%AF%AF");
   }
   res.cookie("vpn_admin_session", createSession(username), {
     httpOnly: true,
@@ -592,7 +592,7 @@ app.post("/clients", requireAuth, async (req, res) => {
 app.put("/api/clients", requireAuth, async (req, res) => {
   const state = await readState();
   const client = state.clients.find((item) => item.id === req.body.id);
-  if (!client) return res.status(404).json({ error: "Client not found" });
+  if (!client) return res.status(404).json({ error: "客户端不存在" });
   if (typeof req.body.displayName === "string") client.displayName = req.body.displayName.trim();
   if (typeof req.body.enabled === "boolean") client.enabled = req.body.enabled;
   if (req.body.rotateSecrets) {
@@ -680,5 +680,5 @@ app.get("/api/subscriptions/shadowrocket/:token", async (req, res) => {
 
 app.listen(env.port, async () => {
   await readState();
-  console.log(`VPN control listening on :${env.port}`);
+  console.log(`代理控制台已启动，监听端口 :${env.port}`);
 });
